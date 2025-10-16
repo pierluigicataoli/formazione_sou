@@ -1,0 +1,24 @@
+
+#! bin/bash
+clear
+
+echo "lo script inizia ora"
+echo
+
+echo "Ciao! $USER"
+echo
+
+echo "ora inserisco 2 variabili"
+echo
+
+stringa="nero"
+numero="9"
+
+echo "Questa è una stringa: $stringa"
+echo
+
+echo "Questo è un numero: $numero"
+
+echo "arrivederci"
+
+exit 0
