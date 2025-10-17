@@ -1,0 +1,17 @@
+#! bin/bash
+clear
+
+base= 7   #assegnazioni variabili
+altezza=12
+
+echo "la base è: $base"    
+echo
+echo "l'altezza è: $altezza"
+echo
+area=$((base * altezza))      #assegnazione variabile tramite operazione
+echo "l'area del rettangolo è: $area"
+echo
+
+echo "$[base*altezza]"    #altro modo per dare output di operazione
+echo
+
