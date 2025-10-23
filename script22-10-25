@@ -10,7 +10,7 @@ fi
 arg=$1
 c=1
 
-if (( $arg + 0 ))  #ciclo che controlla se l'argomento è un numero primo o meno
+if (( $arg + 0 )) 2> /dev/null  #ciclo che controlla se l'argomento è un numero primo o meno
 then
 	echo 
 else
