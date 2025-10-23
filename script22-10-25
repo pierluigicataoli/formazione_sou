@@ -4,14 +4,23 @@ if (( $# != 1 )) 	# il $# contiene il numero di argomenti che vengono passati da
 then
 	echo "Devi immettere solo un argomento"
 
-exit 1
-		#questo if serve a controllare quanti argomenti sono stati passati dall'utente e in caso di errore, a stampare in output l'errore
+exit 1 #questo if serve a controllare quanti argomenti sono stati passati dall'utente e in caso di errore, a stampare in output l'errore
 fi
 
 arg=$1
-c=1          #dichiaro la variabile c, che serve per il ciclo for e la variabile arg, variabile che prende il valore dell'argomento
+c=1
 
-if (( $arg < 1 ))     #controllo per far si che il valore sia un numero maggiore di 1 e di conseguenza accettabile dallo script
+if (( $arg + 0 ))  #ciclo che controlla se l'argomento è un numero primo o meno
+then
+	echo 
+else
+	echo "il numero non è un numero intero, errore" 
+exit 1
+fi
+
+          #dichiaro la variabile c, che serve per il ciclo for e la variabile arg, variabile che prende il valore dell'argomento
+
+if (( $arg < 0 ))     #controllo per far si che il valore sia un numero maggiore di 0 e di conseguenza accettabile dallo script
 then
 	echo "L'argomento deve essere un numero positivo"
 exit 1
