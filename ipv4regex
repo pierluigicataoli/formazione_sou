@@ -1,0 +1,15 @@
+#ci sono diversi comandi che possono mettere in output i vari indirizzi ipv4
+
+
+# su questa macchina utilizzerò il comando ifconfig non avendo il pacchetto iproute2
+
+#elenco di vari comandi:
+
+ifconfig | grep ["...".]
+
+ifconfig | grep "\." 
+
+# ci sono modi più semplici di trovare gli indirizzi ipv4, per esempio.
+
+ifconfig | grep -w "inet" # non è un espressione regolare, ma l'output è lo stesso. 
+
