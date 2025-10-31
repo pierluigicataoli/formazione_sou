@@ -17,5 +17,5 @@ ifconfig | grep -w "inet" # non è un espressione regolare, ma l'output è lo st
 #UPDATE COMMIT
 
 ifconfig | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' #questo è un espressione che matcha tutti gli indirizzi ipv4 possibili. attualmente sto cercando di comprendere come fare lo stesso comando ma per classe di indirizzi specifici.
-
+ifconfig | grep -E "(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\." #questa è una versione migliorata della versione precedente (ha un limite a 255)
 #seguiranno altri commit di update al file
