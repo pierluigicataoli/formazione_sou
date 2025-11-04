@@ -1,0 +1,59 @@
+<<<<<<< HEAD
+echo "primo output"
+echo "secondo output"
+echo "terzo output"
+cambiamento file di main
+=======
+cambiamento test
+aggiunta riga finale
+>>>>>>> test
+
+#spiegazione della sessione git: creazione di un file e commit dello stesso
+#MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git branch
+* main
+  test
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ vim test.txt
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git add test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git commit -m "commit per test #1"
+[main fbaef71] commit per test #1
+ 1 file changed, 3 insertions(+)
+ create mode 100644 test.txt
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ echo "cambiamento file di main" >> test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git add test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git commit -m "cambiamento test.txt"
+[main aa0b3fe] cambiamento test.txt
+ 1 file changed, 1 insertion(+)
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git switch test
+M	ipv4regex
+M	script22-10-25
+Si è passati al branch 'test'
+Il tuo branch è aggiornato rispetto a 'origin/test'.
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ echo "cambiamento test" > test.txt
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ echo "aggiunta riga finale" >> test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git add test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git commit -m "modifica su test.txt da test"
+[test 4621776] modifica su test.txt da test
+ 1 file changed, 2 insertions(+)
+ create mode 100644 test.txt
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git switch main
+M	ipv4regex
+M	script22-10-25
+Si è passati al branch 'main'
+Il tuo branch è avanti rispetto a 'origin/main' di 2 commit.
+  (usa "git push" per pubblicare i tuoi commit locali)
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ git merge test
+Merge automatico di test.txt in corso
+CONFLITTO (aggiunta/aggiunta): conflitto di merge in test.txt
+Merge automatico fallito; risolvi i conflitti ed esegui il commit
+del risultato.
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ vim test.txt 
+MacBook-Pro-di-Pierluigi-cataoli:formazione.sou2 pierluigi_cataoli$ cat test.txt 
+<<<<<<< HEAD
+echo "primo output"
+echo "secondo output"
+echo "terzo output"
+cambiamento file di main
+=======
+cambiamento test
+aggiunta riga finale
+>>>>>>> test

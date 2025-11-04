@@ -2,3 +2,9 @@ echo "primo output"
 echo "secondo output"
 echo "terzo output"
 cambiamento file di main
+cambiamento test
+aggiunta riga finale
+
+#questo è il file test.txt con il conflitto risolto, con un merge che è la fusione di tutte e due i cambiamenti
+
+#verrà inviato nel commit anche il file con l'output del test.txt con il conflitto.
