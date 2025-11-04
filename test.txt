@@ -1,0 +1,3 @@
+echo "primo output"
+echo "secondo output"
+echo "terzo output"
