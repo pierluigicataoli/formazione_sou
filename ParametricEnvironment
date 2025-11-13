@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', 
+               choices: ['DEVELOPMENT', 'PRODUCTION'],
+               description: 'Seleziona l\'ambiente ')    }   //creiamo un menu a tendina dove l'utente andrà a specificare il parametro durante la compilazione della pipeline
+
+    stages {
+        stage('DEVELOPMENT') {
+            when {
+                expression { params.ENVIRONMENT == 'DEVELOPMENT' }    //se il valore che abbiamo inserito in input equivale a <DEVELOPMENT> eseguiamo DEVELOPMENT 
+            }
+            steps {
+                echo "Sto eseguendo: ${params.ENVIRONMENT}"
+            }
+        }
+
+        stage('PRODUCTION') {
+            when {
+                expression { params.ENVIRONMENT == 'PRODUCTION' }  //stesso concetto di DEVELOPMENT ma applicato a PRODUCTION
+            }
+            steps {
+                echo "Sto eseguendo: ${params.ENVIRONMENT}"
+            }
+        }
+    }
+}
