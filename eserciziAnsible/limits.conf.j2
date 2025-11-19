@@ -1,0 +1,7 @@
+{% if target_env == 'production' %}
+* hard nofile 10000
+* soft nofile 10000
+{% elif target_env == 'development' or target_env  == 'collaude' %}
+* hard nofile 1000
+* soft nofile 1000
+{% endif %}

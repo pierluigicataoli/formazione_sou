@@ -1,0 +1,16 @@
+---
+- name: Configurazione Limits
+  hosts: all
+  become: yes
+  
+  vars:
+    target_env: "collaude" 
+
+  tasks:
+    - name: Inserisco il blocco di configurazione in /etc/security/limits.conf
+      ansible.builtin.blockinfile:
+        path: /etc/security/limits.conf
+        block: "{{ lookup('template', 'limits.conf.j2') }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - LIMITS CONFIG"
+        backup: yes
+        
