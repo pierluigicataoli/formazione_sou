@@ -1,0 +1,14 @@
+---
+tasks:
+  - name: Genero whitelist da template
+    ansible.builtin.template:
+      src: whitelist.j2
+      dest: /tmp/whitelist.txt
+    delegate_to: localhost
+    
+  - name: Inserisco whitelist prima dell'esclusione
+    ansible.builtin.blockinfile:
+      path: /etc/security/access.conf
+      block: "{{ lookup('ansible.builtin.file', '/tmp/whitelist.txt') }}"
+      insertbefore: "^- : ALL : ALL"
+      marker: "# {mark} ANSIBLE MANAGED"
