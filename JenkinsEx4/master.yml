@@ -1,0 +1,55 @@
+---
+- name: Avvia Jenkins Master sul Docker Network esistente
+  hosts: all
+  become: yes
+  
+  vars:
+    # Aggiorna questi valori se diversi
+    jenkins_network_name: my_static_network  # NOME ESATTO della rete creata precedentemente
+    jenkins_container_name: jenkins-master
+    jenkins_image: jenkins/jenkins:lts
+    jenkins_static_ip: 172.20.0.10   # IP statico che vuoi assegnare al container
+    jenkins_host_port: 8080
+    jenkins_data_path: /var/jenkins_home
+    
+  tasks:
+    # 1. (OPZIONALE) Verifica la rete (Solo per sicurezza, se l'hai già creata)
+    - name: Verifica che la rete esista
+      community.docker.docker_network:
+        name: "{{ jenkins_network_name }}"
+        state: present
+        
+    # 2. CREAZIONE DIRECTORY E PERMESSI
+    - name: Crea directory persistente per i dati di Jenkins
+      ansible.builtin.file:
+        path: "{{ jenkins_data_path }}"
+        state: directory
+        owner: 1000 
+        group: 1000
+        mode: '0755'
+
+    # 3. AVVIO DEL CONTAINER JENKINS SULLA RETE SPECIFICA
+    - name: Avvia il container Jenkins Master con IP statico sulla rete '{{ jenkins_network_name }}'
+      community.docker.docker_container:
+        name: "{{ jenkins_container_name }}"
+        image: "{{ jenkins_image }}"
+        state: started
+        restart_policy: always
+        
+        # Mappatura delle porte
+        ports:
+          - "{{ jenkins_host_port }}:8080"
+          - "50000:50000"
+        
+        # Mappaggio della directory dati
+        volumes:
+          - "{{ jenkins_data_path }}:{{ jenkins_data_path }}"
+        
+        # <<< PUNTO CHIAVE: Assegnazione Rete e IP Statico >>>
+        networks:
+          - name: "{{ jenkins_network_name }}"
+            ipv4_address: "{{ jenkins_static_ip }}" # L'IP statico verrà assegnato qui
+        
+    - name: Messaggio di conferma
+      ansible.builtin.debug:
+        msg: "Jenkins è disponibile sulla porta {{ jenkins_host_port }}. L'IP statico interno al container è {{ jenkins_static_ip }}"

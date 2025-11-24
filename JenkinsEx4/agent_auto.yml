@@ -1,0 +1,138 @@
+---
+- name: Creazione e Connessione Automatica Jenkins Agent
+  hosts: default
+  gather_facts: yes  # Necessario per ansible_date_time
+  become: yes        # Necessario per creare il servizio Systemd e scrivere in /opt o /etc
+
+  vars:
+    # --- Configurazione ---
+    jenkins_url: "http://192.168.56.101:8080"
+    jenkins_user: "admin"
+    jenkins_password: "eab9cdcc29e14f50a7b0097428354c96"
+    agent_name: "test-agent"
+    agent_remote_fs: "/opt/jenkins-agent"
+    agent_labels: "docker linux"
+    agent_user: "root"
+    
+    agent_config:
+      name: "{{ agent_name }}"
+      nodeDescription: "Agent creato e connesso via Ansible"
+      numExecutors: 1
+      remoteFS: "{{ agent_remote_fs }}"
+      labelString: "{{ agent_labels }}"
+      mode: "EXCLUSIVE"
+      type: "hudson.slaves.DumbSlave"
+      retentionStrategy:
+        stapler-class: "hudson.slaves.RetentionStrategy$Always"
+      nodeProperties:
+        stapler-class-bag: "true"
+      launcher:
+        stapler-class: "hudson.slaves.JNLPLauncher"
+
+  tasks:
+
+    # ==========================================
+    # PARTE 1: Interazione API Jenkins (Create)
+    # ==========================================
+
+    - name: Attesa Jenkins
+      ansible.builtin.uri:
+        url: "{{ jenkins_url }}/login"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 30
+      delay: 10
+    
+    - name: Jenkins Crumb
+      ansible.builtin.uri:
+        url: "{{ jenkins_url }}/crumbIssuer/api/json"
+        user: "{{ jenkins_user }}"
+        password: "{{ jenkins_password }}"
+        force_basic_auth: yes
+        return_content: yes
+        status_code: 200
+      register: crumb_response
+
+    - name: Imposta fact per il Crumb
+      ansible.builtin.set_fact:
+        jenkins_crumb_field: "{{ crumb_response.json.crumbRequestField }}"
+        jenkins_crumb_value: "{{ crumb_response.json.crumb }}"
+
+    - name: Crea il Nodo Agent su Jenkins (se non esiste)
+      ansible.builtin.uri:
+        url: "{{ jenkins_url }}/computer/doCreateItem?name={{ agent_name }}&type=hudson.slaves.DumbSlave"
+        method: POST
+        user: "{{ jenkins_user }}"
+        password: "{{ jenkins_password }}"
+        force_basic_auth: yes
+        headers:
+          "{{ jenkins_crumb_field }}": "{{ jenkins_crumb_value }}"
+        body_format: form-urlencoded
+        body:
+          json: "{{ agent_config | to_json }}"
+        status_code: [200, 302, 400]
+      register: create_node_response
+      changed_when: create_node_response.status in [200, 302]
+
+    - name: Recupera il file JNLP per estrarre il Secret
+      ansible.builtin.uri:
+        url: "{{ jenkins_url }}/computer/{{ agent_name }}/jenkins-agent.jnlp"
+        method: GET
+        user: "{{ jenkins_user }}"
+        password: "{{ jenkins_password }}"
+        force_basic_auth: yes
+        return_content: yes
+      register: jnlp_response
+
+    - name: Estrai il Secret usando Regex
+      ansible.builtin.set_fact:
+        agent_secret: "{{ jnlp_response.content | regex_search('<argument>([a-f0-9]{64})</argument>', '\\1') | first }}"
+
+    - name: Verifica che il secret sia stato trovato
+      fail:
+        msg: "Impossibile trovare il secret nel JNLP. L'agente esiste?"
+      when: agent_secret is not defined or agent_secret == ""
+
+    # ==========================================
+    # PARTE 2: Configurazione Sistema (Connect)
+    # ==========================================
+
+    - name: Assicurati che Java sia installato
+      ansible.builtin.package:
+        name: java-17-openjdk
+        state: present
+      ignore_errors: yes
+
+    - name: Crea la directory di lavoro dell'agent
+      ansible.builtin.file:
+        path: "{{ agent_remote_fs }}"
+        state: directory
+        owner: "{{ agent_user }}"
+        mode: '0755'
+
+    - name: Scarica agent.jar dal Master
+      ansible.builtin.get_url:
+        url: "{{ jenkins_url }}/jnlpJars/agent.jar"
+        dest: "{{ agent_remote_fs }}/agent.jar"
+        owner: "{{ agent_user }}"
+        mode: '0644'
+
+    - name: Crea il file di servizio Systemd per l'Agent
+      ansible.builtin.copy:
+        dest: "/etc/systemd/system/jenkins-agent-{{ agent_name }}.service"
+        content: |
+          [Unit]
+          Description=Jenkins Agent {{ agent_name }}
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/java -jar {{ agent_remote_fs }}/agent.jar -url {{ jenkins_url }} -secret {{ agent_secret }} -name {{ agent_name }} -workDir {{ agent_remote_fs }}
+          User={{ agent_user }}
+          Restart=always
+          RestartSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: Riavvia Agent
+
