@@ -1,0 +1,18 @@
+Ho svolto l'esercizio all'interno di una macchina virtuale vagrant con sistema operativo rocky.
+
+l'obiettivo è stato raggiunto grazie al comando "sudo nsenter -t 1940 -a sleep 500 &" dove 1940 nel mio caso era il PID del container.
+Con il man ho visto diverse opzioni e tra queste ho utilizzato l'opzione -a e l'opzione -t.
+-t sta per target e infatti va a targettare il PID di riferimento (quello del container nel comando)
+-a è un opzione che permette di entrare a far parte di tutti i namespaces associati al PID del target.
+
+rispondo alle domande in base alle mie osservazioni:
+
+1. Il pid è diverso tra macchina host e container, nel mio caso il pid del comando era 9320 mentre all'interno del container il pid del comando era 420.
+
+2. stoppando il container con il comando docker stop jenkins-master nel mio caso, anche il processo lato host è stato killato.
+Questo però mi sembrava strano e mi sono andato ad informare. Il processo è morto solamente per via del namespace cgroup.
+Quando ho fatto partire il comando nsenter, con l'opzione -a il processo è entrato a far parte anche del namespace cgroup.
+Cgroup è un namespace che ha il compito di migliorare la sicurezza del container ed isolare i stessi.
+cgroup per questione di pulizia elimina forzatamente tutti i processi associati a lui.
+
+3. se provo a killare il processo da dentro il container il processo viene killato anche su macchina host.
