@@ -1,0 +1,16 @@
+#! bin/bash
+clear
+
+v1="thirteen"
+v2="13"
+v3="happy birthday"
+
+echo "$v1;$v2;$v3"
+echo
+
+#sono variabili locali
+
+unset v3     #unset serve per non rendere disponibile una variabile o alias.
+#   non posso vedere le variabili nelle shell figlie,finche non le esporto
+
+

@@ -1,0 +1,78 @@
+comandi che non conoscevo:
+
+env #comando che mostra tutte le variabili GLOBALI
+
+ricordare che le variabili sono case sensitive su linux.
+
+le variabili vengono create in questo modo -->> nomevariabile="valore"
+
+le variabili create in questo modo vengono chiamate variabili locali, e di conseguenza sono variabili presente solo all'interno della shell di appartenenza.
+
+c'è un modo per esportare una variabile, tramite il comando export -->> export nomevariabile="valore" NB: vale solo per le shell padre, una shell figlia non può exportare una variabile alla shell padre.
+
+parametri speciali: sono parametri che come nel esempio $? che mette nel parametro il valore delle exit state --> 1 se errore, 0 no errore
+
+IMPORTANTE:
+
+Nel manuale c'è uno script che crea in un file una copia dei log con time stamps ecc.
+ovviamente essendo lo script fatto da un utente, con le sue directory personale ecc, lo script funziona solo sul suo ambiente.
+Per rendere possibile di far partire lo script al livello globale, utilizziamo delle variabili che devono essere cambiate da ogni utente che fa partire lo script
+in questo modo si può rendere lo script accessibile a chiunque.
+
+le variabili possono prendere anche percorsi come value.
+
+vediamo la funzione if, utile nella creazione degli script, la sintassi dello script è molto simile ai linguaggi di programmazione:
+if (condizione rispettata)
+else (condizione se exit=1)
+
+in bash la funzione if si scrive in questo modo:
+if [ -espressione primaria file]
+then
+ cosa da fare ecc
+else
+   in caso si vuole fare qualcosa se la condizione non è rispettata
+fi per finire l'if (in c++ era})
+
+NB : 	in caso si deve utilizzare l'else, la sintassi dell'if cambia, come nel esempio qui sotto:
+if [[ "$genere" == "f*" ]]
+then echo "è una donna"
+else echo "è un uomo"
+fi
+
+Anche in bash è presente l'elif. l'elif viene utilizzato quando hai più di due condizioni da verificare e solo una di queste deve essere vera.
+
+ORA APPUNTI SU SCRIPT INTERATTIVI
+
+ovviamente esistono anche script interattivi in bash.
+
+Ci sono comandi, come per esempio il comando read, che permettono all'utente di inserire in input una variabile.
+un altro comando che permette all'utente di inserire un input all'interno di uno script è exec, un comando molto potente e potenzialmente dannoso se non usato adeguatamente.
+for il ciclo for e il ciclo while sono due modelli di ciclo che possono essere utilizzati all'interno del bash environment per gli script ciclici.
+
+Poi abbiamo visto il comando select:
+il comando select è un comando che permette all'utente di creare un menu a tendina e di conseguenza permette all'utilizzatore dello script una selezione tra varie opzioni
+
+Ora vediamo il comadno shift:
+
+Comando che viene utilizzato all'interno di un ciclo while o for, e permette di prendere un determinato segmento e processare i dati all'interno di esso, per poi shiftare il segmento e prendendo il successivo.
+
+poi abbiamo visto l'opzione declare, opzione che permette di dichiarare il tipo di variabile, tra cui le array.
+
+ora vediamo degli esempi presi dal manuale sul funzionamento delle array all'interno di bash.
+
+nomearray=(uno due tre)
+echo ${nomearray[*]} -->> stampa uno due tre
+echo $nomearray[*] -->> stampa uno 
+echo ${nomearray[2]}-->> stampa tre
+nomearray[3]=quattro -->> mette quattro all'interno dell'array
+echo ${nomearray[*]} -->> stampa uno due tre quattro
+
+questi sono piccoli esempi per capire il funzionamento delle array base su bash.
+
+i valori di un array possono essere disattivati
+
+unset nomearray[1]
+
+echo ${nomearray[*]} -->> stampa uno tre quattro #non ha stampato due perché era il valore nella posizione 1 dell'array, ricordiamo che inizia da 0 la stringa.
+
+

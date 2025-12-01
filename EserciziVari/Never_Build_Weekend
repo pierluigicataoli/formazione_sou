@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Controllo giorno della settimana') {
+            steps {
+                script {
+                    def oggi = new Date()    //definizione che stabilisce la data odierna
+                    def giornoSettimana = oggi.getDay()
+                    
+                    if (giornoSettimana<= 5) {           //controllo se il giorno è compreso tra lunedì (1) e venerdì (5)
+                        echo "${oggi.format('EEEE')} è un giorno lavorativo, Procedo con la build senza problemi."
+                    } else {
+                        echo " Oggi è ${oggi.format('EEEE')}. La build non verrà eseguita. Never build on weekends !"
+                        return
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Qui andavano inseriti i vari comandi di build...'
+            }
+        }
+    }
+}

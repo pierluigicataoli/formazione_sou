@@ -1,0 +1,23 @@
+Esistono due modi diversi di connettere lo slave con il master:
+Tramite SSH
+Tramite connessione JNLP
+
+Ssh è un modo automatizzato che permette la connessione dell’agent al master tramite chiavi ssh configurate.
+
+l’altra modalità, quella a mano per intenderci è tramite JNLP. Il Jnlp è manuale perché richiede un comando specifico per la comunicazione con il master.
+
+Quando viene creato un nuovo nodo all’interno del jenkins master, possiamo specificare la tipologia di connessione che dobbiamo utilizzare per permettere la connessione dello stesso nodo al master, in caso decidiamo di fare tramite JNLP dopo aver creato il nodo, lo stesso Jenkins ci fornisce i comandi e tutti i dati da inserire(URL del master e secret token dell'agent)  nella riga di comando dell’agente per la connessione.
+
+#Il comando qui sotto è un copia e incolla del mio jenkins master.
+
+curl -sO http://localhost:8080/jnlpJars/agent.jar
+
+java -jar agent.jar -url http://localhost:8080/ -secret a1b35c8ed0c3e1d0dd00e318c106e113dc96775ac09798291af632feb7b91a8f -name "jenkins-agent-01" -webSocket -workDir "/home/jenkins/agent"
+
+Tramite il comando curl scarichiamo agent.jar comando che permette la connessione con il master.
+
+Dopodiché usiamo il comando java per collegarci al master.
+
+Questo permette la connessione tramite JNLP, 2 passaggi molto semplici. (esclusa ovviamente la creazione del nodo sul master)
+
+Come la connessione SSH anche la connessione tramite JNLP può venir automatizzata, tramite ad esempio docker o ansible, inserendo i vari dati dell' agent all'interno dei file yaml.
