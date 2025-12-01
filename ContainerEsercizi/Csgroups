@@ -1,0 +1,46 @@
+Esercizio su containers Csgroups
+
+Ho seguito i vari obiettivi dell'esercizio. Andrò a spiegare passo passo tutti i step che ho fatto sulla vm linux (rocky).
+
+Primo step dell'esercizio era runnare un container (nel mio caso docker) con una restrizione alla memoria.
+tramite il flag --memory= (come spiegato nella track dell'esercizio) andiamo a specificare alla creazione del container il limite massimo di memoria (RAM) assegnato al container stesso.
+Il --memory configura direttamente il csgroups del container.
+è importante però andare a configurare un limite anche alla memoria swap, per evitare intoppi con l'esercizio.
+Per disattivare la memoria swap, ho utilizzato il flag --memory-swap= con valore pari a 300 (300 era anche il valore del flag memory) cosi che vado a disattivare la swap(facendo questo processo è come se portiamo a 0 la memoria swap da utilizzare)
+
+all'interno del container faccio partire un processo che utilizza una determinata quantita di memoria per andare ad occuparla. 
+
+Dopodiché passo al secondo obiettivo dell'esercitazione
+
+entro all'interno del container e utilizzo il comando free
+
+con il comando free vediamo in output la memoria che attualmente è in uso/ quella occupata e quella totale.
+
+successivamente si passa all'ultimo obiettivo. Impostare un memory.max inferiore alla memoria utilizzata e di conseguenza killare il container tramite OOM (Out Of Memory)
+
+il memory.max è un file con una sola riga con scritto un valore decimale, quel valore decimale è la quantita del limite di memoria in bytes.
+
+Per modificare il file dobbiamo semplicemente modificare quell'unica riga.
+
+con il comando find trovo il percorso specifico grazie all'id del container che ho creato.
+
+Successivamente vado a modificare il file memory.max
+
+Ho provato inizialmente a modificare il comando con vim, ma ho avuto problemi con i permessi, di conseguenza ho utilizzato il comando echo con un valore di circa 300 mb e sudo tee.
+
+echo | sudo tee
+
+una volta modificato il memory.max.
+
+Il container viene killato dall'OOM killer del kernel Linux.
+
+risposte alle domande:
+
+1. dal mio punto di vista l'uccisione è stata praticamente istantanea, dopo che ho cambiato il memory.max, ho scritto il comando docker ps e mi dava lo stato exited con valore 137.
+Il valore 137 (di solito) è l'errore di OOM.
+
+2. Appena modificato il memory.max in output è stato solamente inserito l'output del comando echo | sudo tee. la kille del container è stata priva di output a schermo, infatti l'ho
+vista solo dopo il comando docker ps. la memoria non è stata deallocata, ma questo probabilmente solo perchè ho disabilitato la memoria swap. 
+In caso contrario la memoria sarebbe stata allocata alla memoria swap, per consentire al container di rimanere in vita, a discapito ovviamente delle prestazioni.
+
+
