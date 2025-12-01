@@ -1,0 +1,95 @@
+L'obiettivo di questo esercizio era di esportare una share NFS da una vm all'altra vm (ovviamente tutte le vm sono collegate alla stessa subnet) i tre modalità differenti:
+
+1. Bind Volume
+2. Volume
+3. mount diretto all'interno del container.
+
+analizzo step by step i procedimenti.
+
+Ovviamente il primo passaggio è stata la creazione delle due vm, entrambe avevano la stessa rete, una aveva docker scaricato e l'altra aveva scaricato nfs-kernel-server.
+
+all'interno della vm server NFS ho creato la cartella condivisa, e configurato il file system shared. Inserito all'interno di /srv/nfs/share/ un file di testo che verrà condiviso tra le due vm.
+Successivamente ho configurato l'export del host della vm con docker e fatto partire l'export.
+
+Successivamente ho svolto l'export nelle tre diverse modalità.
+
+La prima modalità che andrò ad analizzare è la bind mount.
+
+per spiegare le modalità andrò a copiare e incollare i vari comandi e spiegarli.
+
+sudo mkdir -p /mnt/nfs_client 
+sudo mount 192.168.3.10:/srv/nfs/cond /mnt/nfs_client
+
+Questi sono "tutti" i comandi usati per la bind volume 
+
+il primo comando va a creare un punto di mount.
+
+mentre il secondo lo monta con l'indirizzo ip della vm con NFS (ovviamente questi comandi sono stati fatti tutti su macchina con docker)
+
+Successivamente ho startato il container con il bind mount e di fatto dava in output il file di testo.
+
+docker run --rm -v /mnt/nfs_client:/data alpine cat /data/file.txt
+
+Questo è il comando che avvia il container. Da notare la sintassi, tutto viene reso possibile dal flag -v /mnt/nfs-client:/data cosa fa questa opzione?
+Monta la cartella specifica del'host in una specifica path del container, e difatti prende anche i file al suo interno. file.txt è il file che era stato creato nella macchina server
+
+Andiamo ora a vedere la seconda modalità.
+
+Docker Volume:
+
+Questa modalità è molto simile alla precedente, ma invece di utilizzare il punto mnt, utilizza il docker volume.
+
+Analizziamo il comando.
+
+docker volume create --driver local \
+--opt type=nfs \
+--opt o=addr=192.168.3.10,rw \
+--opt device=:/srv/nfs/cond \
+vol_nfs
+ 
+Ho creato il vol_nfs (nome volume) specificando il tipo di volume (nfs) l'address del server e i permessi rw.
+nel device ho inserito la cartella creata condivisa creata in locale sulla vm server.
+
+Come dicevo prima, le modalità sono molto simili, infatti il comando per runnare il docker è praticamente lo stesso, ma con l'opzione -v non vado a specificare un path ma il volume.
+
+docker run --rm -v vol_nfs:/data alpine cat /data/file.txt
+
+L'esercizio bonus consisteva nel fare lo stesso processo del volume ma con docker-compose, quindi ho creato un file docker-compose.yml e avviato con docker compose up.
+
+version: '3.8'
+services:
+ app:
+  image: alpine
+  command: cat /data/file.txt
+  volumes:
+   - nfs-data:/data
+volumes:
+ nfs-data:
+  driver: local
+  driver_opts:
+   type: nfs
+   o: addr=192.168.3.10,rw
+   device: ":/srv/nfs/cond"
+
+Questa è la copia del file yaml, la sintassi è praticamente identica al comando di creazione del volume.
+
+Ora passiamo all'ultima modalità, mount da container.
+
+la domanda che viene fatto nella track dell'esercizio è cosa è necessario, per eseguire il mount direttamente da container. Ovviamente sono necessari i permessi.
+Quindi dobbiamo far partire un container con i privilegi e dopo aver fatto partire il container entrarci dentro.
+
+Installare all'interno di esso i pacchetti nfs-common (lato client nfs)
+Creare una directory di mount locale mkdir -p /mnt/data
+
+E successivamente far partire il comando di mount con l'opzione -t. L'opzione -t è importantissima, infatti va a specificare il tipo di file system per il mount, mostro l'esempio.
+
+mount -t nfs 192.168.3.10:/srv/nfs/cond /mnt/data 
+
+192.168.3.10:/srv/nfs/cond va a definire il server nella condivisione, infatti l'indirizzo è l'indirizzo del server mentre il path, è il path della cartella condivisa nel server.
+
+Successivamente viene messo il punto di mount locale. (creato prima)
+
+
+
+
+
