@@ -1,0 +1,33 @@
+Questo è il metodo più utilizzato.
+
+Prima cosa da fare è la creazione del PV (PersistentVolume)
+
+Quindi andiamo come prima cosa a creare il manifest.yml che va a creare il PV
+
+Il nome del file è "nfs-pv.yml"
+
+nel file yml andiamo a definire tutte le varie specs, come per esempio:
+
+AccessMode
+
+ReclaimPolicy
+
+E ovviamente lo Storage.
+
+E andiamo ad inserire l'indirizzo ip del server NFS
+
+Ovviamente andiamo ad applicare il file yml e a creare il nostro PV
+
+Dopo aver creato il PV, dobbiamo creare il PVC
+
+La procedura è molto simile alla creazione del PV, andiamo ad inserire i dati inseriti anche all'interno del file.yml del PV.
+
+Con kubectl apply -f nfs-pvc.yml vado a creare il PVC. Ora che il PVC è stato creato con il comando kubectl get pvc in output dice che il pvc è in Bound, quindi è collegato al PV.
+
+Successivamente, come ultimo step dell'esercizio bisogna creare il Pod.
+
+Il pod è stato creato nel file yml "nfs-pod.yml"
+
+Ora il Pod ha solamente bisogno di richiamare il PVC per avera accesso al PV.
+
+ 
