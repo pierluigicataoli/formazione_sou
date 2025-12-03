@@ -1,0 +1,10 @@
+Primo step ho creato una cartella condivisa e inserito all'interno della cartella un file di testo
+
+Il file di testo serve solamente per prova
+
+Dopodiché ho trovato con il comando minikube ip la subnet di rete del cluster minikube.
+
+Quindi con il comando sudo vim /etc/exports ho modificato il file export per permettere la connessione tra host e client minikube (pod)
+
+Quindi sono andato a creare il file yaml VolumePod.yml che mi va a creare un Pod con volume.
+
