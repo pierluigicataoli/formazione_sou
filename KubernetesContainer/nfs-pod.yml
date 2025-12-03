@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nfs-pod-pvc
+spec:
+  containers:
+    - name: app-container
+      image: busybox
+      command: ["/bin/sh", "-c", "tail -f /dev/null"]
+      volumeMounts:
+        - name: nfs-data
+          mountPath: "/mnt/data-nfs" 
+  volumes:
+    - name: nfs-data
+      persistentVolumeClaim:
+        claimName: nfs-storage-claim 
