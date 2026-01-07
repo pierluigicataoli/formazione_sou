@@ -1,0 +1,25 @@
+version: '3'
+services:
+  riva_sx:
+    build: .
+    container_name: riva_sx
+    hostname: riva_sx
+    volumes:
+      - ./stato_barca:/dati_barca
+    networks:
+      - fiume_net
+
+  riva_dx:
+    build: .
+    container_name: riva_dx
+    hostname: riva_dx
+    volumes:
+      - ./stato_barca:/dati_barca
+    networks:
+      - fiume_net
+
+networks:
+  fiume_net:
+
+volumes:
+  stato_barca:
