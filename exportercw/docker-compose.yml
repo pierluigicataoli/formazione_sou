@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  cloudwatch-exporter:
+    image: prom/cloudwatch-exporter:latest
+    container_name: cw_exporter
+    ports:
+      - "9106:9106"
+    volumes:
+      - ./cloudwatch_config.yml:/config/config.yml
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+
+  # 2. Prometheus che archivia i dati
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - cloudwatch-exporter
+
+  # 3. Grafana per visualizzare i grafici
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin 
+    depends_on:
+      - prometheus
