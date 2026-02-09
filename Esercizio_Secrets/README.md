@@ -9,4 +9,4 @@ kubernetes.io/ssh-auth
 
 Ho creato i secrets con kubectl apply -f.
 
-Per estrarre i secrets il comando è kubectl get secret nome-secret -o yaml, così però il risultato è codificato in base64, se vogliamo vedere la chiave in chiaro bisogna decodificarla con base64 --encode.
+Per estrarre i secrets il comando è kubectl get secret nome-secret -o yaml, così però il risultato è codificato in base64, se vogliamo vedere la chiave in chiaro bisogna decodificarla con base64 --decode.
