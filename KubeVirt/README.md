@@ -1,4 +1,4 @@
-Cosa è KubeVirt e quali problemi va a risolvere?  KubeVirt è un estensione di k8s che permette di containerizzare macchine virtuali.  Una VM classica VMware è possibile tradurla come un processo QEMU/KVS che gira su un Hypervisor ESXi.  Il processo QEMU/KVS è un processo che permette  la gestione ad alte prestazioni delle macchine virtuali (come se fossero macchine native)
+Cosa è KubeVirt e quali problemi va a risolvere?  KubeVirt è un estensione di k8s che permette di containerizzare macchine virtuali. Una VM classica è possibile "convertirla" in un processo QEMU/KVM per farla girare su un Hypervisor basato su Linux.  Il processo QEMU/KVS è un processo che permette  la gestione ad alte prestazioni delle macchine virtuali (come se fossero macchine native)
 
 QEMU è un software che ha il compito di “emulare” le risorse hardware, le periferiche per essere precisi.
 
@@ -43,8 +43,9 @@ NB: è possibile cambiare il valore del parametro limit o maxMemory mentre la VM
 - Il QEMU Guest Agent è un software che deve essere presente all’interno della VMI. Permette la comunicazione tra Hypervisor e Sistema Operativo.
        Il suo compito principale è quello di “aggiornare” il Sistema Operativo, su tutti i cambiamenti che vengono effettuati dal Hypervisor.
 
-- Il Sistema Operativo, deve possedere i moduli che permettono l’HOTPLUG, questi moduli sono il CONFIG_MEMORY_HOTPLUG e il CONFIG_MEMORY_REMOVE.
-      Gli ultimi S.O (quelli più moderni) hanno i moduli pre caricati.
+- Il Sistema Operativo deve supportare i moduli per l’Hotplug (come acpi_memhotplug e memory_hotplug). Tali funzionalità dipendono dalla configurazione del Kernel Linux, in particolare dall'attivazione delle opzioni CONFIG_MEMORY_HOTPLUG e CONFIG_MEMORY_HOTREMOVE in fase di compilazione
+      
+Gli ultimi S.O (quelli più moderni) hanno i moduli pre caricati.
 
 Tutti le distribuzioni Linux degli ultimi 10-15 anni hanno i moduli presenti all’interno del proprio Kernel.
 
@@ -58,7 +59,11 @@ NB: BISOGNA CAMBIARE LO YAML DELLA VM, NON DELLA VMI.
 
 Aumento della CPU:
 
-I requisiti sono pressoché molto simili, l’uniche differenze sono i campi che vanno modificati.  - Per la Feature Gate bisogna aggiungere la funzione “CPUHotplug”
+I requisiti sono pressoché molto simili, l’uniche differenze sono i campi che vanno modificati. 
+
+ - Per la Feature Gate bisogna aggiungere la funzione “CPUHotplug”
+
+- Il Sistema Operativo deve supportare i moduli per l’Hotplug della CPU (come acpi_cpuhotplug). Tali funzionalità dipendono dalla configurazione del Kernel Linux, in particolare dall'attivazione dell'opzione CONFIG_HOTPLUG_CPU in fase di compilazione.
 
 -Come nel caso dell’aumento della RAM il file yaml deve essere impostato per supportare un limit sul numero di socket (sockets -> requests  maxSockets -> limit)
 
@@ -72,7 +77,11 @@ Il processo di aggiungere un volume è il processo più semplice, perché vengon
 
 Il processo è differente quasi del tutto diverso rispetto agli altri precedentemente affrontati.
 
-L’unica cosa che rimane invariata nei requisiti è il Feature Gate, all’interno di esso bisogna aggiungere la feature “HotPlugVolumes”
+Tranne per il Feature Gate e per il Sistema Operativo.
+
+- Nel Feature Gate bisogna aggiungere la feature "HotPlugVolumes"
+
+- Il Sistema Operativo deve supportare i moduli per l’Hotplug dei dischi (come pci_hotplug o acpiphp). Queste funzionalità dipendono dalla configurazione del Kernel Linux, in particolare dall'attivazione delle opzioni CONFIG_HOTPLUG_PCI e del supporto specifico per il bus o il controller utilizzato (es. CONFIG_SCSI)
 
 Per il resto i requisiti sono completamenti diversi da quelli visti in precedenza.
 
